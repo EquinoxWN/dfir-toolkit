@@ -1,0 +1,28 @@
+name: Custom.DFIR.Generic.ProcessSnapshot
+author: EquinoxWN
+description: |
+  Running processes with parent, user, command line, executable path and the SHA-256 of the
+  executable on disk. Run as a hunt across the fleet, then stack the results with
+  `dfir hunt stack --artifact Custom.DFIR.Generic.ProcessSnapshot` to find executables that only
+  a few hosts run (least frequency of occurrence).
+
+  Read-only: lists processes and reads executables to hash them; nothing on the endpoint changes.
+
+type: CLIENT
+
+parameters:
+  - name: ProcessRegex
+    description: Only processes whose name matches this regular expression.
+    type: regex
+    default: .
+  - name: HashExecutables
+    description: Hash each process executable (SHA-256). Turn off on very busy hosts.
+    type: bool
+    default: Y
+
+sources:
+  - query: |
+      SELECT Pid, Ppid, Name, Username, Exe, CommandLine, CreateTime,
+             if(condition=HashExecutables, then=hash(path=Exe).SHA256) AS ExeSHA256
+      FROM pslist()
+      WHERE Name =~ ProcessRegex

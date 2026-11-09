@@ -1,0 +1,81 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: the workflow can read the code and nothing else.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # Every action is pinned to a full commit SHA.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: make setup
+      - run: make lint
+      - name: Tests
+        run: |
+          python -m pytest -q -rs | tee pytest.log
+          echo "::notice title=pytest::$(tail -n 1 pytest.log)"
+      - name: Memory triage on the synthetic fixtures
+        run: |
+          dfir memory triage tests/fixtures/memory/injected | tee triage.log
+          echo "::notice title=memory triage::$(head -n 1 triage.log)"
+      - name: Fleet stacking, 10,000 synthetic hosts
+        run: |
+          make bench | tee bench.log
+          echo "::notice title=hunt stack::$(grep 'distinct keys' bench.log)"
+      - name: Known-vulnerability audit
+        run: make audit
+
+  # The artifacts loaded by a real Velociraptor, which collects from the runner itself.
+  velociraptor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VELO_VERSION: v0.77.3
+      VELO_SHA256: c2c4eb585f16b622cd57de04995a7a13c076ee455bc2a828fd9243cec2ccfed8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Download Velociraptor (pinned release, checksum verified)
+        run: |
+          curl -fsSL --retry 3 --max-time 300 -o velociraptor.gz \
+            "https://github.com/Velocidex/velociraptor/releases/download/${VELO_VERSION}/velociraptor-${VELO_VERSION}-linux-amd64.gz"
+          echo "${VELO_SHA256}  velociraptor.gz" | sha256sum -c -
+          gunzip velociraptor.gz && chmod 0755 velociraptor
+      - name: Collect from the runner with the repo's artifacts
+        run: |
+          sudo ./velociraptor --definitions artifacts artifacts collect -v \
+            Custom.DFIR.Generic.ProcessSnapshot Custom.DFIR.Generic.NetworkConnections Custom.DFIR.Linux.Persistence \
+            --output collection.zip 2>&1 | tail -n 20
+          sudo chown "$(id -u)" collection.zip
+      - name: Parse the collection with dfir hunt stack
+        run: |
+          for a in Custom.DFIR.Generic.ProcessSnapshot Custom.DFIR.Generic.NetworkConnections Custom.DFIR.Linux.Persistence; do
+            dfir hunt stack collection.zip --artifact "$a" --host ci-runner --show 0 | tee -a stack.log
+          done
+          grep -q "ProcessSnapshot: 1 hosts" stack.log
+          echo "::notice title=velociraptor collection::$(grep ProcessSnapshot stack.log)"
+      - name: Failing output as an annotation (logs need signing in)
+        if: failure()
+        run: tail -n 30 stack.log 2>/dev/null | python3 -c "import sys; print('::error title=velociraptor::' + sys.stdin.read().replace('%', '%25').replace('\r', '').replace('\n', '%0A'))"

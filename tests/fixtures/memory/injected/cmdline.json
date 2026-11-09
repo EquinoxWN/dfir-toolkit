@@ -1,0 +1,88 @@
+Volatility 3 Framework 2.28.2
+
+[
+  {
+    "Args": null,
+    "PID": 4,
+    "Process": "System",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\services.exe",
+    "PID": 700,
+    "Process": "services.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\lsass.exe",
+    "PID": 712,
+    "Process": "lsass.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch -p",
+    "PID": 820,
+    "Process": "svchost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\System32\\svchost.exe -k NetworkService -p",
+    "PID": 860,
+    "Process": "svchost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\Explorer.EXE",
+    "PID": 1120,
+    "Process": "explorer.exe",
+    "__children": []
+  },
+  {
+    "Args": "taskhostw.exe {222A245B-E637-4AE9-A93F-A59CA119A75E}",
+    "PID": 1500,
+    "Process": "taskhostw.exe",
+    "__children": []
+  },
+  {
+    "Args": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE\" /n \"C:\\Users\\alex\\Downloads\\invoice-0420.docm\"",
+    "PID": 2210,
+    "Process": "WINWORD.EXE",
+    "__children": []
+  },
+  {
+    "Args": "powershell.exe -nop -w hidden -enc RQBYAEEATQBQAEwARQAtAE4ATwBUAC0AQQAtAFMARQBDAFIARQBUAA==",
+    "PID": 2384,
+    "Process": "powershell.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Users\\Public\\svchost.exe -k netsvcs",
+    "PID": 2512,
+    "Process": "svchost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\lsass.exe",
+    "PID": 2690,
+    "Process": "lsass.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\ProgramData\\scvhost.exe",
+    "PID": 2730,
+    "Process": "scvhost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\notepad.exe",
+    "PID": 3100,
+    "Process": "notepad.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\rundll32.exe C:\\ProgramData\\helper.dll,Start",
+    "PID": 3220,
+    "Process": "rundll32.exe",
+    "__children": []
+  }
+]

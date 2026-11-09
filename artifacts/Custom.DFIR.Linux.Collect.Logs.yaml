@@ -1,0 +1,36 @@
+name: Custom.DFIR.Linux.Collect.Logs
+author: EquinoxWN
+description: |
+  Uploads authentication and system logs into the collection as evidence, with their size,
+  modification time and SHA-256, so the copy can be checked against the original later (chain of
+  custody). Files larger than MaxUploadSize are listed and hashed but not uploaded.
+
+  Read-only on the endpoint: files are read and copied into the collection, never changed.
+
+type: CLIENT
+
+precondition: SELECT OS FROM info() WHERE OS = 'linux'
+
+parameters:
+  - name: LogGlobs
+    description: Glob patterns of log files to collect.
+    type: csv
+    default: |
+      Glob
+      /var/log/auth.log*
+      /var/log/secure*
+      /var/log/syslog*
+      /var/log/messages*
+      /var/log/wtmp
+      /var/log/btmp
+  - name: MaxUploadSize
+    description: Do not upload files larger than this many bytes.
+    type: int
+    default: "52428800"
+
+sources:
+  - query: |
+      SELECT OSPath, Size, Mtime, hash(path=OSPath).SHA256 AS SHA256,
+             if(condition=Size < int(int=MaxUploadSize), then=upload(file=OSPath)) AS Upload
+      FROM glob(globs=LogGlobs.Glob)
+      WHERE NOT IsDir

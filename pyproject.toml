@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dfir-toolkit"
+version = "0.1.0"
+description = "Velociraptor evidence-collection artifacts with fleet stacking, and Volatility 3 memory triage for hidden, masquerading and injected processes."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = ["PyYAML>=6.0.2,<7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-timeout>=2.3", "ruff>=0.6", "mypy>=1.11", "types-PyYAML>=6.0", "pip-audit>=2.7"]
+# Volatility 3 runs in a child process (Volatility Software License 1.0); needed for `dfir memory run`.
+vol = ["volatility3==2.28.2"]
+
+[project.scripts]
+dfir = "dfir_toolkit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 300
+markers = [
+    "vol: runs the installed Volatility 3 (pip install -e \".[vol]\")",
+]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = [".tmp", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "S", "SIM", "RUF", "N", "C4", "PT", "RET", "PIE", "PERF"]
+ignore = ["E501", "PERF401"]
+
+[tool.ruff.lint.per-file-ignores]
+# Paths such as /dev/shm/... are evidence strings here, never opened.
+"tests/**" = ["S101", "S603", "S104", "S108"]
+"src/dfir_toolkit/synth.py" = ["S311", "S108"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["volatility3.*"]
+ignore_missing_imports = true

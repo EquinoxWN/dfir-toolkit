@@ -1,0 +1,43 @@
+Volatility 3 Framework 2.28.2
+
+[
+  {
+    "Created": null,
+    "ForeignAddr": "0.0.0.0",
+    "ForeignPort": 0,
+    "LocalAddr": "0.0.0.0",
+    "LocalPort": 49664,
+    "Offset": 18446638520861781632,
+    "Owner": "lsass.exe",
+    "PID": 712,
+    "Proto": "TCPv4",
+    "State": "LISTENING",
+    "__children": []
+  },
+  {
+    "Created": null,
+    "ForeignAddr": "192.168.56.1",
+    "ForeignPort": 445,
+    "LocalAddr": "192.168.56.20",
+    "LocalPort": 49720,
+    "Offset": 18446638520861784056,
+    "Owner": "svchost.exe",
+    "PID": 860,
+    "Proto": "TCPv4",
+    "State": "ESTABLISHED",
+    "__children": []
+  },
+  {
+    "Created": null,
+    "ForeignAddr": "198.51.100.80",
+    "ForeignPort": 443,
+    "LocalAddr": "192.168.56.20",
+    "LocalPort": 49730,
+    "Offset": 18446638520861788226,
+    "Owner": "explorer.exe",
+    "PID": 1120,
+    "Proto": "TCPv4",
+    "State": "ESTABLISHED",
+    "__children": []
+  }
+]

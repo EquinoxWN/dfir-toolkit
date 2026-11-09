@@ -1,0 +1,40 @@
+name: Custom.DFIR.Linux.Persistence
+author: EquinoxWN
+description: |
+  Files that start programs automatically on Linux: cron tables, systemd units, shell profiles
+  and SSH authorized_keys. Each file is listed with its size, modification time and SHA-256, so a
+  hunt can stack them across the fleet and surface the entries that only a few hosts have.
+
+  Read-only: lists and hashes files; nothing on the endpoint changes.
+
+type: CLIENT
+
+precondition: SELECT OS FROM info() WHERE OS = 'linux'
+
+parameters:
+  - name: PersistenceGlobs
+    description: Glob patterns of files that can start programs automatically.
+    type: csv
+    default: |
+      Glob
+      /etc/crontab
+      /etc/cron.d/*
+      /etc/cron.{hourly,daily,weekly,monthly}/*
+      /var/spool/cron/**
+      /etc/systemd/system/**/*.{service,timer}
+      /usr/lib/systemd/system/*.{service,timer}
+      /etc/rc.local
+      /etc/profile.d/*
+      /home/*/.ssh/authorized_keys
+      /root/.ssh/authorized_keys
+  - name: MaxHashSize
+    description: Do not hash files larger than this many bytes.
+    type: int
+    default: "10485760"
+
+sources:
+  - query: |
+      SELECT OSPath, Size, Mtime,
+             if(condition=Size < int(int=MaxHashSize), then=hash(path=OSPath).SHA256) AS SHA256
+      FROM glob(globs=PersistenceGlobs.Glob)
+      WHERE NOT IsDir

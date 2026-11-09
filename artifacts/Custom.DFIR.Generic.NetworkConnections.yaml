@@ -1,0 +1,24 @@
+name: Custom.DFIR.Generic.NetworkConnections
+author: EquinoxWN
+description: |
+  Open sockets with the owning process id: local and remote address and port, protocol and
+  state. Stack the remote endpoints across the fleet to find destinations that only one or two
+  hosts talk to, then join the Pid with Custom.DFIR.Generic.ProcessSnapshot.
+
+  Read-only: reads the socket table; nothing on the endpoint changes.
+
+type: CLIENT
+
+parameters:
+  - name: StateRegex
+    description: Only sockets whose state matches this regular expression (for example ESTAB).
+    type: regex
+    default: .
+
+sources:
+  - query: |
+      SELECT Pid, FamilyString AS Family, TypeString AS Type, Status,
+             Laddr.IP AS LocalAddr, Laddr.Port AS LocalPort,
+             Raddr.IP AS RemoteAddr, Raddr.Port AS RemotePort
+      FROM netstat()
+      WHERE Status =~ StateRegex

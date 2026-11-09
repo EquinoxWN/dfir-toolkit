@@ -1,0 +1,30 @@
+name: Custom.DFIR.Windows.Persistence.RunKeys
+author: EquinoxWN
+description: |
+  Programs registered to start at logon under the Run and RunOnce registry keys, for the machine
+  and for every loaded user hive. Stack ValueName and Command across the fleet to find the
+  entries that only a few hosts have.
+
+  Read-only: reads registry values; nothing on the endpoint changes.
+
+type: CLIENT
+
+precondition: SELECT OS FROM info() WHERE OS = 'windows'
+
+parameters:
+  - name: RunKeyGlobs
+    description: Registry globs of autostart values.
+    type: csv
+    default: |
+      Glob
+      HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run\*
+      HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce\*
+      HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run\*
+      HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Run\*
+      HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\RunOnce\*
+
+sources:
+  - query: |
+      SELECT OSPath.Dirname AS Key, Name AS ValueName, Data.value AS Command, Mtime
+      FROM glob(globs=RunKeyGlobs.Glob, accessor="registry")
+      WHERE NOT IsDir

@@ -1,0 +1,46 @@
+Volatility 3 Framework 2.28.2
+
+[
+  {
+    "Args": null,
+    "PID": 4,
+    "Process": "System",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\services.exe",
+    "PID": 700,
+    "Process": "services.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\lsass.exe",
+    "PID": 712,
+    "Process": "lsass.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\system32\\svchost.exe -k DcomLaunch -p",
+    "PID": 820,
+    "Process": "svchost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\System32\\svchost.exe -k NetworkService -p",
+    "PID": 860,
+    "Process": "svchost.exe",
+    "__children": []
+  },
+  {
+    "Args": "C:\\Windows\\Explorer.EXE",
+    "PID": 1120,
+    "Process": "explorer.exe",
+    "__children": []
+  },
+  {
+    "Args": "taskhostw.exe {222A245B-E637-4AE9-A93F-A59CA119A75E}",
+    "PID": 1500,
+    "Process": "taskhostw.exe",
+    "__children": []
+  }
+]
