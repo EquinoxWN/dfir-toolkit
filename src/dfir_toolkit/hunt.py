@@ -169,7 +169,7 @@ def _zip_host(zf: zipfile.ZipFile, path: Path) -> str:
         raise InputError(f"{path}: client_info.json is too large")
     try:
         data = json.loads(zf.read(info))
-    except json.JSONDecodeError as exc:
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         raise InputError(f"{path}: client_info.json is not JSON ({exc})") from exc
     for key in ("Fqdn", "Hostname", "ClientId"):
         value = data.get(key) if isinstance(data, dict) else None

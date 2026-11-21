@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 from dfir_toolkit import artifacts, hunt, memory, synth, volrunner
@@ -24,15 +24,19 @@ def _fraction(text: str) -> float:
     return value
 
 
-def _positive_int(text: str) -> int:
-    """argparse type: an integer of at least 1."""
-    try:
-        value = int(text)
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError(f"not an integer: {text!r}") from exc
-    if value < 1:
-        raise argparse.ArgumentTypeError("must be at least 1")
-    return value
+def _int_at_least(minimum: int) -> Callable[[str], int]:
+    """argparse type: an integer of at least minimum."""
+
+    def parse(text: str) -> int:
+        try:
+            value = int(text)
+        except ValueError as exc:
+            raise argparse.ArgumentTypeError(f"not an integer: {text!r}") from exc
+        if value < minimum:
+            raise argparse.ArgumentTypeError(f"must be at least {minimum}")
+        return value
+
+    return parse
 
 
 def _positive_float(text: str) -> float:
@@ -144,12 +148,12 @@ def build_parser() -> argparse.ArgumentParser:
     st.add_argument(
         "--rare-fraction", type=_fraction, default=0.01, help="rare = on at most this share of hosts (default 0.01)"
     )
-    st.add_argument("--show", type=int, default=20, help="rare entries to print")
+    st.add_argument("--show", type=_int_at_least(0), default=20, help="rare entries to print")
     st.add_argument("--json", help="write the report as JSON")
     st.add_argument("--md", help="write the report as Markdown")
     st.set_defaults(func=cmd_hunt_stack)
     sy = hnt.add_parser("synth", help="write a synthetic fleet hunt export")
-    sy.add_argument("--hosts", type=_positive_int, default=1000)
+    sy.add_argument("--hosts", type=_int_at_least(1), default=1000)
     sy.add_argument("--seed", type=int, default=0)
     sy.add_argument("--out", required=True)
     sy.set_defaults(func=cmd_hunt_synth)

@@ -66,11 +66,18 @@ SHELLS = frozenset(
     }
 )
 SYSTEM32_RE = re.compile(r"^\\?(\\\?\?\\)?[a-z]:\\windows\\(system32|syswow64)\\", re.I)
-ENCODED_PS_RE = re.compile(r"\s-(e|ec|en|enc|enco|encod|encode|encodedc|encodedcommand)\s", re.I)
+
+
+def _abbreviations(option: str) -> str:
+    """Regex alternation of every prefix of a PowerShell option, longest first."""
+    return "|".join(option[:n] for n in range(len(option), 0, -1))
+
+
+ENCODED_PS_RE = re.compile(rf"\s[-/](ec|{_abbreviations('encodedcommand')})\s", re.I)
 DOWNLOAD_CRADLE_RE = re.compile(
     r"downloadstring|downloadfile|invoke-webrequest|\biwr\b|net\.webclient|start-bitstransfer", re.I
 )
-HIDDEN_WINDOW_RE = re.compile(r"\s-(w|wi|win|windowstyle)\s+(h|hidden)\b", re.I)
+HIDDEN_WINDOW_RE = re.compile(rf"\s[-/]({_abbreviations('windowstyle')})\s+(h|hidden|1)\b", re.I)
 # Internal ranges; everything else (documentation ranges included) counts as external.
 INTERNAL_NETS = tuple(
     ipaddress.ip_network(n)

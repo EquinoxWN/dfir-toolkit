@@ -134,6 +134,14 @@ def test_bad_client_info_is_rejected(tmp_path: Path, members: dict[str, str], me
         list(hunt.read_collection_zip(make_zip(tmp_path, members)))
 
 
+def test_non_utf8_client_info_is_an_input_error(tmp_path: Path) -> None:
+    path = tmp_path / "host.zip"
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("client_info.json", b'{"Fqdn": "\xff"}')
+    with pytest.raises(InputError, match=r"client_info.json is not JSON"):
+        list(hunt.read_collection_zip(path))
+
+
 def test_a_non_zip_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "fake.zip"
     path.write_bytes(b"PK not really")

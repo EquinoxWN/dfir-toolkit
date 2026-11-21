@@ -79,6 +79,7 @@ def test_stack_reports_input_errors_with_exit_1(tmp_path: Path, capsys: pytest.C
         ["memory", "run", "--image", "a", "--outdir", "b", "--timeout", "0"],
         ["memory", "run", "--image", "a", "--outdir", "b", "--timeout", "soon"],
         ["hunt", "stack", "x.jsonl", "--artifact", "Nope"],
+        ["hunt", "stack", "x.jsonl", "--show", "-1"],
     ],
 )
 def test_invalid_arguments_exit_2(argv: list[str]) -> None:
