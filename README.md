@@ -16,7 +16,7 @@ the safety gate:
 
 ![dfir memory triage and dfir artifacts check](docs/proof/triage.jpg)
 
-164 tests pass, lint and strict types are clean, the dependency audit finds nothing, and stacking a
+168 tests pass (164 in the screenshot, before the 2026-11-21 polish), lint and strict types are clean, the dependency audit finds nothing, and stacking a
 10,000-host hunt export (218,503 rows) surfaces exactly the two planted executables:
 
 ![pytest, ruff, mypy, pip-audit and fleet stacking](docs/proof/tests.jpg)
@@ -108,7 +108,7 @@ release from its project page to run the artifacts; CI uses v0.77.3.
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 make setup     # pip install -e ".[dev,vol]"
 make lint      # ruff, ruff format, mypy --strict, dfir artifacts check
-make test      # 164 tests
+make test      # 168 tests
 make bench     # stack a synthetic 10,000-host hunt export
 make triage    # triage the synthetic memory fixtures
 ```
@@ -145,7 +145,7 @@ mutation table (11 hand mutations, all killed) are in [docs/quality/2026-11-01.m
 
 | Check | Result |
 |---|---|
-| Tests | **164 passed**, 0 failed, 0 skipped (local, Python 3.14.5) |
+| Tests | **168 passed**, 0 failed, 0 skipped (local, Python 3.14.5) |
 | Memory triage, planted image | 13 findings (12 high, 1 medium), exactly the planted set; clean baseline 0 |
 | Stacking 10,000 hosts, 218,503 rows | 2 rare keys, both planted; 3.3 s CPU, 3.9 s wall (best of 3, one thread) |
 | Lint / types / audit | ruff and mypy `--strict` clean; `pip-audit`: no known vulnerabilities |
